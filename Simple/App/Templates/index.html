@@ -3,9 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News</title>
+    <title>Logistics Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello {{D_Email}}</h1>
+    <div class="container">
+        <h1>Logistics Management System</h1>
+
+        <div class="section">
+            <h2>Add Driver</h2>
+            <form action="{% url 'add_driver' %}" method="post">
+                {% csrf_token %}
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+                <label for="phone">Phone:</label>
+                <input type="number" id="phone" name="phone" required>
+                <button type="submit">Add Driver</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Add Vehicle</h2>
+            <form action="{% url 'add_vehicle' %}" method="post">
+                {% csrf_token %}
+                <label for="number">Vehicle Number:</label>
+                <input type="text" id="number" name="number" required>
+                <label for="v_type">Vehicle Type:</label>
+                <input type="text" id="v_type" name="v_type" required>
+                <label for="capacity">Capacity:</label>
+                <input type="number" id="capacity" name="capacity" required>
+                <label for="driver">Driver:</label>
+                <select id="driver" name="driver" required>
+                    {% for driver in drivers %}
+                        <option value="{{ driver.id }}">{{ driver.D_Name }} ({{ driver.D_EMail }})</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Add Vehicle</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Add Route</h2>
+            <form action="{% url 'add_route' %}" method="post">
+                {% csrf_token %}
+                <label for="start">Start Location:</label>
+                <input type="text" id="start" name="start" required>
+                <label for="end">End Location:</label>
+                <input type="text" id="end" name="end" required>
+                <label for="distance">Distance:</label>
+                <input type="number" step="0.01" id="distance" name="distance" required>
+                <label for="vehicle">Vehicle:</label>
+                <select id="vehicle" name="vehicle" required>
+                    {% for vehicle in vehicles %}
+                        <option value="{{ vehicle.id }}">{{ vehicle.V_Number }} ({{ vehicle.V_Type }})</option>
+                    {% endfor %}
+                </select>
+                <button type="submit">Add Route</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Add Delivery</h2>
+            <form action="{% url 'add_delivery' %}" method="post">
+                {% csrf_token %}
+                <label for="item">Item:</label>
+                <input type="text" id="item" name="item" required>
+                <label for="weight">Weight:</label>
+                <input type="number" step="0.01" id="weight" name="weight" required>
+                <label for="route">Route:</label>
+                <select id="route" name="route" required>
+                    {% for route in routes %}
+                        <option value="{{ route.id }}">{{ route.R_Start }} to {{ route.R_End }}</option>
+                    {% endfor %}
+                </select>
+                <label for="date">Delivery Date:</label>
+                <input type="date" id="date" name="date" required>
+                <button type="submit">Add Delivery</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Add Booking</h2>
+            <form action="{% url 'add_booking' %}" method="post">
+                {% csrf_token %}
+                <label for="b_name">Name:</label>
+                <input type="text" id="b_name" name="name" required>
+                <label for="b_email">Email:</label>
+                <input type="email" id="b_email" name="email" required>
+                <label for="b_phone">Phone:</label>
+                <input type="text" id="b_phone" name="phone" required>
+                <label for="pickup">Pickup Location:</label>
+                <input type="text" id="pickup" name="pickup" required>
+                <label for="dropoff">Dropoff Location:</label>
+                <input type="text" id="dropoff" name="dropoff" required>
+                <label for="pickup_date">Pickup Date:</label>
+                <input type="date" id="pickup_date" name="pickup_date" required>
+                <label for="return_date">Return Date (optional):</label>
+                <input type="date" id="return_date" name="return_date">
+                <label for="vehicle_type">Vehicle Type:</label>
+                <input type="text" id="vehicle_type" name="vehicle_type" required>
+                <button type="submit">Add Booking</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Drivers</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for driver in drivers %}
+                        <tr>
+                            <td>{{ driver.D_Name }}</td>
+                            <td>{{ driver.D_EMail }}</td>
+                            <td>{{ driver.D_Phone }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">No drivers yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Vehicles</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Type</th>
+                        <th>Capacity</th>
+                        <th>Driver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehicle in vehicles %}
+                        <tr>
+                            <td>{{ vehicle.V_Number }}</td>
+                            <td>{{ vehicle.V_Type }}</td>
+                            <td>{{ vehicle.V_Capacity }}</td>
+                            <td>{{ vehicle.Driver.D_Name }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">No vehicles yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Routes</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Distance</th>
+                        <th>Vehicle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for route in routes %}
+                        <tr>
+                            <td>{{ route.R_Start }}</td>
+                            <td>{{ route.R_End }}</td>
+                            <td>{{ route.R_Distance }}</td>
+                            <td>{{ route.Vehicle.V_Number }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">No routes yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Deliveries</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Weight</th>
+                        <th>Route</th>
+                        <th>Delivery Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for delivery in deliveries %}
+                        <tr>
+                            <td>{{ delivery.D_Item }}</td>
+                            <td>{{ delivery.D_Weight }}</td>
+                            <td>{{ delivery.Route.R_Start }} to {{ delivery.Route.R_End }}</td>
+                            <td>{{ delivery.Delivery_Date }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">No deliveries yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Bookings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Pickup</th>
+                        <th>Dropoff</th>
+                        <th>Pickup Date</th>
+                        <th>Return Date</th>
+                        <th>Vehicle Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.name }}</td>
+                            <td>{{ booking.email }}</td>
+                            <td>{{ booking.phone }}</td>
+                            <td>{{ booking.pickup_location }}</td>
+                            <td>{{ booking.dropoff_location }}</td>
+                            <td>{{ booking.pickup_date }}</td>
+                            <td>{{ booking.return_date|default:"N/A" }}</td>
+                            <td>{{ booking.vehicle_type }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="8">No bookings yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
